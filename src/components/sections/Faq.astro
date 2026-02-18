@@ -1,0 +1,67 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+
+const faqs = [
+  {
+    q: '出生時間が分からなくても使えますか？',
+    a: 'はい。不明な場合でも利用できます。読み取れる範囲で傾向を整理します。',
+    open: true,
+  },
+  {
+    q: 'AIだけで作られていますか？',
+    a: '四柱推命の考え方をベースに、AIで整理しています。未来や結果を断定するロジックは使用していません。',
+  },
+  {
+    q: '個人情報は安全ですか？',
+    a: '入力された情報は診断およびサービス提供目的以外には使用しません。',
+  },
+  {
+    q: '料金はいくらですか？',
+    a: '詳細な料金はLINE内でご確認いただけます。まず無料で診断内容をご確認ください。',
+  },
+  {
+    q: '占いとはどう違うのですか？',
+    a: '占いは解釈者の感覚に依存しますが、本サービスはAIが一定基準で傾向を整理します。未来予測は行いません。',
+  },
+]
+
+const lineUrl = 'https://bysfl175.autosns.app/line'
+---
+
+<section class="section-dark py-20 sm:py-28 px-4">
+  <div class="max-w-2xl mx-auto">
+    <SectionHeader label="FAQ" title="よくある質問" />
+
+    <div class="reveal reveal-delay-1">
+      {faqs.map((faq) => (
+        <div class:list={['faq-item', faq.open && 'open']} data-faq>
+          <button class="w-full flex items-center justify-between py-5 text-left" data-faq-trigger>
+            <span class="text-sm sm:text-base text-white/80 font-sans font-medium pr-4">{faq.q}</span>
+            <svg class="faq-toggle flex-shrink-0 w-5 h-5 text-brand-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <div>
+              <p class="text-sm text-white/50 leading-relaxed font-sans pb-5">{faq.a}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- FAQ後のCTA（疑問解消直後に行動させる） -->
+    <div class="reveal reveal-delay-2 text-center mt-10 pt-8 border-t border-brand-gold/10">
+      <p class="text-sm text-white/50 font-sans mb-4">
+        疑問は解消されましたか？まずは無料で試してみてください。
+      </p>
+      <a
+        href={lineUrl}
+        class="cta-btn cta-pulse inline-block text-base px-8 py-4 sm:py-5 w-full sm:w-auto max-w-md mx-auto"
+      >
+        ＼ 無料で診断 ／ 自分の判断パターンを見てみる
+      </a>
+      <p class="text-[11px] text-white/25 mt-2 font-sans">合わなければいつでもブロック解除できます</p>
+    </div>
+  </div>
+</section>

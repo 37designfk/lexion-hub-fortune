@@ -1,0 +1,66 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+
+const features = [
+  {
+    title: 'AIが客観的に整理',
+    description: '解釈者の感覚に左右されない、\n一定基準のデータ分析',
+    icon: 'cpu',
+  },
+  {
+    title: '傾向だけを抽出',
+    description: '未来予測ではなく、あなたの\n行動パターンにフォーカス',
+    icon: 'chart',
+  },
+  {
+    title: 'LINEで完結',
+    description: '登録から結果受信まで全てLINE内。\nいつでも読み返せる',
+    icon: 'message',
+  },
+]
+---
+
+<section class="section-gradient py-20 sm:py-28 px-4">
+  <div class="max-w-4xl mx-auto">
+    <SectionHeader label="About" title="Lexion Hub Fortune とは" />
+
+    <div class="max-w-2xl mx-auto mb-14 reveal reveal-delay-1">
+      <p class="text-sm sm:text-base text-white/60 leading-loose font-sans text-center">
+        四柱推命は、「未来を当てる」ものではありません。<br />
+        生年月日・出生時間から行動の傾向を整理するための、<br class="hidden sm:block" />
+        古くから使われてきた体系的な考え方です。
+      </p>
+      <p class="text-sm sm:text-base text-white/60 leading-loose font-sans text-center mt-4">
+        私たちはこれをAIで処理し、<br />
+        感情や思い込みを排除した<br class="sm:hidden" />
+        <span class="text-brand-gold/80">「あなた固有の判断傾向レポート」</span>として整理します。
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 sm:gap-6">
+      {features.map((f, i) => (
+        <div class:list={['card-glass rounded-2xl p-6 sm:p-8 text-center reveal', `reveal-delay-${i + 1}`]}>
+          <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center">
+            {f.icon === 'cpu' && (
+              <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5M4.5 15.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 006 8.25v9A2.25 2.25 0 008.25 19.5z" />
+              </svg>
+            )}
+            {f.icon === 'chart' && (
+              <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+              </svg>
+            )}
+            {f.icon === 'message' && (
+              <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+              </svg>
+            )}
+          </div>
+          <h3 class="font-serif text-base sm:text-lg font-semibold text-white/90 mb-3">{f.title}</h3>
+          <p class="text-xs sm:text-sm text-white/50 leading-relaxed font-sans whitespace-pre-line">{f.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

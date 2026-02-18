@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Hero from '../components/sections/Hero.astro'
+import PainPoint from '../components/sections/PainPoint.astro'
+import About from '../components/sections/About.astro'
+import Benefit from '../components/sections/Benefit.astro'
+import SocialProof from '../components/sections/SocialProof.astro'
+import Steps from '../components/sections/Steps.astro'
+import Target from '../components/sections/Target.astro'
+import Faq from '../components/sections/Faq.astro'
+import Trust from '../components/sections/Trust.astro'
+import ClosingCta from '../components/sections/ClosingCta.astro'
+import Footer from '../components/sections/Footer.astro'
+import StickyCta from '../components/StickyCta.astro'
+---
+
+<Layout title="Lexion Hub Fortune｜AI × 四柱推命で判断パターンを可視化">
+  <Hero />
+  <PainPoint />
+  <About />
+  <Benefit />
+  <SocialProof />
+  <Steps />
+  <Target />
+  <Faq />
+  <Trust />
+  <ClosingCta />
+  <Footer />
+  <StickyCta />
+
+  <script>
+    // ── Sparkle generator ──
+    const field = document.getElementById('sparkleField')
+    if (field) {
+      for (let i = 0; i < 30; i++) {
+        const dot = document.createElement('div')
+        dot.className = 'sparkle'
+        dot.style.left = `${Math.random() * 100}%`
+        dot.style.top = `${Math.random() * 100}%`
+        dot.style.animationDelay = `${Math.random() * 4}s`
+        dot.style.animationDuration = `${3 + Math.random() * 3}s`
+        field.appendChild(dot)
+      }
+    }
+
+    // ── Scroll reveal (IntersectionObserver) ──
+    const revealElements = document.querySelectorAll('.reveal')
+    if (revealElements.length) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible')
+              observer.unobserve(entry.target)
+            }
+          })
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      )
+      revealElements.forEach((el) => observer.observe(el))
+    }
+
+    // ── Sticky CTA ──
+    const stickyCta = document.getElementById('stickyCta')
+    const spacer = document.getElementById('stickySpacerBottom')
+    if (stickyCta) {
+      let shown = false
+      const threshold = window.innerHeight * 0.6
+
+      if (spacer) spacer.style.display = 'none'
+
+      window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY || window.pageYOffset
+        if (scrollY > threshold && !shown) {
+          stickyCta.classList.add('show')
+          if (spacer) spacer.style.display = 'block'
+          shown = true
+        } else if (scrollY <= threshold && shown) {
+          stickyCta.classList.remove('show')
+          if (spacer) spacer.style.display = 'none'
+          shown = false
+        }
+      }, { passive: true })
+    }
+
+    // ── FAQ Accordion ──
+    document.querySelectorAll('[data-faq-trigger]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('[data-faq]')
+        if (!item) return
+        const isOpen = item.classList.contains('open')
+
+        document.querySelectorAll('[data-faq].open').forEach((el) => {
+          el.classList.remove('open')
+        })
+
+        if (!isOpen) {
+          item.classList.add('open')
+        }
+      })
+    })
+
+    // ── Live counter (simulated social proof) ──
+    const liveCounter = document.getElementById('liveCounter')
+    if (liveCounter) {
+      // Generate a plausible number based on time of day
+      const hour = new Date().getHours()
+      const base = hour >= 9 && hour <= 23 ? 30 + Math.floor(Math.random() * 40) : 8 + Math.floor(Math.random() * 15)
+
+      function updateCounter() {
+        const delta = Math.floor(Math.random() * 5) - 2
+        const count = Math.max(base + delta, 5)
+        liveCounter.innerHTML = `本日 <strong class="text-white/70">${count}名</strong> が診断を受けています`
+      }
+
+      updateCounter()
+      setInterval(updateCounter, 12000)
+    }
+  </script>
+</Layout>

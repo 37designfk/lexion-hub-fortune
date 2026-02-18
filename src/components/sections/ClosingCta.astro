@@ -1,0 +1,43 @@
+---
+import CtaButton from '../ui/CtaButton.astro'
+---
+
+<section class="relative py-24 sm:py-32 px-4 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-brand-black via-brand-navy to-brand-black"></div>
+  <div class="absolute inset-0">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-gold/[0.03] blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 max-w-2xl mx-auto text-center">
+    <div class="reveal">
+      <p class="text-xs tracking-[0.25em] text-brand-gold/50 uppercase mb-6 font-sans">Start Now</p>
+      <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-semibold text-white/90 leading-snug mb-5">
+        自分の傾向を、<br />一度整理してみませんか
+      </h2>
+      <p class="text-sm text-white/50 font-sans leading-relaxed mb-4">
+        知らないまま同じ判断を繰り返すか、<br />
+        一度立ち止まって自分のパターンを確認するか。
+      </p>
+      <p class="text-sm text-white/40 font-sans leading-relaxed mb-10">
+        たった1〜2分の入力で、あなた固有のレポートが届きます。
+      </p>
+    </div>
+
+    <!-- QR code -->
+    <div class="reveal reveal-delay-1 mb-8">
+      <div class="inline-block p-4 rounded-2xl bg-white/[0.03] border border-brand-gold/10">
+        <img
+          src="https://fortune.lexionhub.com/wp-content/uploads/2025/12/qr-code-10-1.png"
+          alt="LINE友だち登録 QRコード"
+          class="w-32 h-32 sm:w-40 sm:h-40 rounded-xl"
+          loading="lazy"
+        />
+      </div>
+      <p class="text-[11px] text-white/25 mt-3 font-sans">スマートフォンのカメラでQRコードを読み取れます</p>
+    </div>
+
+    <div class="reveal reveal-delay-2">
+      <CtaButton size="large" showBadge={true} />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,33 @@
+---
+interface Props {
+  class?: string
+  size?: 'default' | 'large'
+  showBadge?: boolean
+}
+
+const { class: className = '', size = 'default', showBadge = false } = Astro.props
+const url = 'https://bysfl175.autosns.app/line'
+const sizeClasses = size === 'large'
+  ? 'text-lg sm:text-xl px-10 py-5 sm:py-6'
+  : 'text-base px-8 py-4 sm:py-5'
+---
+
+<div class:list={['text-center', className]}>
+  {showBadge && (
+    <p class="text-xs text-brand-gold/60 font-sans mb-3 tracking-wide">
+      累計 10,000件以上の診断実績
+    </p>
+  )}
+  <a
+    href={url}
+    class:list={['cta-btn cta-pulse inline-block w-full sm:w-auto max-w-md mx-auto', sizeClasses]}
+  >
+    ＼ 無料で診断 ／<br class="sm:hidden" />
+    <span class={size === 'large' ? 'text-base sm:text-lg' : 'text-sm sm:text-base'}>自分の判断パターンを見てみる</span>
+  </a>
+  <p class="text-xs text-white/40 mt-3 font-sans leading-relaxed">
+    入力目安：1〜2分｜無料・登録カンタン<br class="sm:hidden" />
+    <span class="hidden sm:inline">｜</span>結果はLINEで完結・いつでも読み返し可能
+  </p>
+  <p class="text-[11px] text-white/25 mt-1.5 font-sans">合わなければいつでもブロック解除できます</p>
+</div>

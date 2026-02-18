@@ -1,0 +1,67 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+
+const items = [
+  {
+    icon: 'lock',
+    title: '個人情報は診断目的のみに使用',
+    desc: '第三者提供や目的外利用はいたしません',
+  },
+  {
+    icon: 'shield',
+    title: '不安を煽る表現・強制はしません',
+    desc: 'あくまで自己理解の参考情報としてご活用ください',
+  },
+  {
+    icon: 'clipboard',
+    title: '未来や結果を断定しません',
+    desc: '傾向の整理に徹し、予測や判断は行いません',
+  },
+  {
+    icon: 'check',
+    title: '運営：株式会社37Design',
+    desc: 'AIデータ整理サービスとして運営しています',
+  },
+]
+---
+
+<section class="section-gradient py-20 sm:py-28 px-4">
+  <div class="max-w-4xl mx-auto">
+    <SectionHeader label="Trust" title="安心してご利用いただける4つの理由" />
+
+    <div class="grid sm:grid-cols-2 gap-5 sm:gap-6">
+      {items.map((item, i) => (
+        <div class:list={['card-glass rounded-2xl p-6 sm:p-7 reveal', `reveal-delay-${i + 1}`]}>
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-gold/10 border border-brand-gold/15 flex items-center justify-center">
+              {item.icon === 'lock' && (
+                <svg class="w-4.5 h-4.5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              )}
+              {item.icon === 'shield' && (
+                <svg class="w-4.5 h-4.5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              )}
+              {item.icon === 'clipboard' && (
+                <svg class="w-4.5 h-4.5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+                </svg>
+              )}
+              {item.icon === 'check' && (
+                <svg class="w-4.5 h-4.5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+            </div>
+            <div>
+              <h3 class="font-serif text-sm sm:text-base font-semibold text-white/85 mb-1">{item.title}</h3>
+              <p class="text-xs text-white/40 font-sans leading-relaxed">{item.desc}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

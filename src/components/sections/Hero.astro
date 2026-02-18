@@ -1,0 +1,57 @@
+---
+import CtaButton from '../ui/CtaButton.astro'
+---
+
+<section class="relative min-h-screen flex items-center justify-center px-4 py-20 overflow-hidden">
+  <!-- Background video -->
+  <video
+    class="absolute inset-0 w-full h-full object-cover"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    poster="https://fortune.lexionhub.com/wp-content/uploads/2025/12/Lexion-Hub-Fortune-White.png"
+    src="https://fortune.lexionhub.com/wp-content/uploads/2025/12/14560_960x540.mp4"
+  ></video>
+  <!-- Dark overlay -->
+  <div class="absolute inset-0 bg-brand-black/70"></div>
+  <div class="hero-particles"></div>
+  <div class="sparkle-field" id="sparkleField"></div>
+
+  <div class="relative z-10 max-w-2xl mx-auto text-center">
+    <img
+      src="https://fortune.lexionhub.com/wp-content/uploads/2025/12/Lexion-Hub-Fortune-White.png"
+      alt="Lexion Hub Fortune"
+      class="hero-fade hero-fade-delay-1 mx-auto mb-8 h-10 sm:h-12 w-auto"
+    />
+
+    <div class="hero-fade hero-fade-delay-1 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-brand-gold/20 bg-brand-gold/5 mb-8">
+      <span class="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse"></span>
+      <span class="text-xs tracking-wider text-brand-gold-light font-sans">累計診断数 10,000件以上</span>
+    </div>
+
+    <h1 class="hero-fade hero-fade-delay-2 font-serif font-bold leading-tight mb-6">
+      <span class="block text-3xl sm:text-4xl md:text-5xl text-white/95">なぜあなたは、</span>
+      <span class="block text-3xl sm:text-4xl md:text-5xl text-white/95 mt-1">同じ場面で</span>
+      <span class="block text-4xl sm:text-5xl md:text-6xl text-gold-gradient mt-2">迷い続けるのか。</span>
+    </h1>
+
+    <p class="hero-fade hero-fade-delay-3 text-sm sm:text-base text-white/60 leading-relaxed mb-2 font-sans">
+      生年月日から、あなたの「判断パターン」を<br class="sm:hidden" />
+      AIが1分で可視化します。
+    </p>
+    <p class="hero-fade hero-fade-delay-3 text-xs text-brand-gold/60 tracking-widest mb-10 font-sans">
+      四柱推命 &times; AI による自己理解サービス
+    </p>
+
+    <div class="hero-fade hero-fade-delay-4">
+      <CtaButton />
+    </div>
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 hero-fade hero-fade-delay-4">
+    <span class="text-[10px] tracking-[0.2em] text-white/20 uppercase font-sans">Scroll</span>
+    <div class="w-px h-8 bg-gradient-to-b from-brand-gold/40 to-transparent animate-pulse"></div>
+  </div>
+</section>

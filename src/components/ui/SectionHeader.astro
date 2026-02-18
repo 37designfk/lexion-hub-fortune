@@ -1,0 +1,14 @@
+---
+interface Props {
+  label: string
+  title: string
+}
+
+const { label, title } = Astro.props
+---
+
+<div class="text-center mb-14 reveal">
+  <p class="text-xs tracking-[0.25em] text-brand-gold/50 uppercase mb-4 font-sans">{label}</p>
+  <h2 class="font-serif text-2xl sm:text-3xl font-semibold text-white/90 mb-4">{title}</h2>
+  <div class="gold-divider"></div>
+</div>

@@ -1,0 +1,80 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description = '生年月日からあなたの判断パターンをAIが1分で可視化。四柱推命の考え方をベースにした自己理解サービス。' } = Astro.props
+
+const siteUrl = 'https://fortune.lexionhub.com'
+const ogImage = 'https://fortune.lexionhub.com/wp-content/uploads/2025/12/Lexion-Hub-Fortune-White.png'
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={siteUrl} />
+
+  <!-- OGP -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={siteUrl} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:site_name" content="Lexion Hub Fortune" />
+  <meta property="og:locale" content="ja_JP" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- FAQ structured data -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "出生時間が分からなくても使えますか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "はい。不明な場合でも利用できます。読み取れる範囲で傾向を整理します。" }
+      },
+      {
+        "@type": "Question",
+        "name": "AIだけで作られていますか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "四柱推命の考え方をベースに、AIで整理しています。未来や結果を断定するロジックは使用していません。" }
+      },
+      {
+        "@type": "Question",
+        "name": "個人情報は安全ですか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "入力された情報は診断およびサービス提供目的以外には使用しません。" }
+      },
+      {
+        "@type": "Question",
+        "name": "料金はいくらですか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "詳細な料金はLINE内でご確認いただけます。まず無料で診断内容をご確認ください。" }
+      },
+      {
+        "@type": "Question",
+        "name": "占いとはどう違うのですか？",
+        "acceptedAnswer": { "@type": "Answer", "text": "占いは解釈者の感覚に依存しますが、本サービスはAIが一定基準で傾向を整理します。未来予測は行いません。" }
+      }
+    ]
+  })} />
+</head>
+<body>
+  <slot />
+</body>
+</html>

@@ -1,0 +1,32 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+import CtaButton from '../ui/CtaButton.astro'
+
+const steps = [
+  { num: '1', title: 'LINEで友だち登録', desc: '簡単な案内が届きます', connector: true },
+  { num: '2', title: '生年月日・出生時間を入力', desc: '出生時間は不明でもOK', connector: true },
+  { num: '3', title: 'レポートをLINEで受信', desc: 'いつでも読み返せる形でお届け', connector: false },
+]
+---
+
+<section class="section-dark py-20 sm:py-28 px-4">
+  <div class="max-w-4xl mx-auto">
+    <SectionHeader label="How to Use" title="たった3ステップで完了" />
+
+    <div class="grid md:grid-cols-3 gap-10 md:gap-6 mb-14">
+      {steps.map((s, i) => (
+        <div class:list={['text-center reveal', `reveal-delay-${i + 1}`, s.connector && 'step-connector']}>
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-brand-gold/20 to-brand-gold/5 border border-brand-gold/20 flex items-center justify-center mb-5">
+            <span class="font-serif text-2xl font-bold text-brand-gold">{s.num}</span>
+          </div>
+          <h3 class="font-serif text-base font-semibold text-white/90 mb-2">{s.title}</h3>
+          <p class="text-xs text-white/45 font-sans leading-relaxed">{s.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="reveal reveal-delay-3">
+      <CtaButton />
+    </div>
+  </div>
+</section>

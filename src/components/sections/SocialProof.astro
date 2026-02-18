@@ -1,0 +1,62 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+
+const voices = [
+  {
+    stars: 5,
+    text: '同じことを繰り返す理由が言語化されてスッキリした。3ページのレポートで自分の癖が見えた。',
+    initial: 'A',
+    attr: '30代・女性・会社員',
+  },
+  {
+    stars: 5,
+    text: '占いじゃなくてデータとして見られるのがよかった。部下との関わり方を見直すきっかけになった。',
+    initial: 'K',
+    attr: '40代・男性・管理職',
+  },
+  {
+    stars: 4,
+    text: 'LINEで完結するので気軽に使えた。内容も納得感があり、友人にも勧めた。',
+    initial: 'M',
+    attr: '20代・女性・フリーランス',
+  },
+]
+---
+
+<section class="section-gradient py-20 sm:py-28 px-4">
+  <div class="max-w-4xl mx-auto">
+    <SectionHeader label="Voice" title="利用された方の声" />
+
+    <!-- リアルタイム社会証明 -->
+    <div class="text-center mb-10 reveal">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-gold/5 border border-brand-gold/15">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-line opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-line"></span>
+        </span>
+        <span class="text-xs text-white/50 font-sans" id="liveCounter">本日 <strong class="text-white/70">47名</strong> が診断を受けています</span>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5 sm:gap-6">
+      {voices.map((v, i) => (
+        <div class:list={['card-glass rounded-2xl p-6 sm:p-8 reveal', `reveal-delay-${i + 1}`]}>
+          <div class="stars text-sm mb-3">
+            {Array.from({ length: 5 }).map((_, si) => (
+              <span>{si < v.stars ? '\u2605' : '\u2606'}</span>
+            ))}
+          </div>
+          <p class="text-sm text-white/70 leading-relaxed font-sans mb-5">
+            「{v.text}」
+          </p>
+          <div class="flex items-center gap-3 border-t border-white/5 pt-4">
+            <div class="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold text-xs font-bold">
+              {v.initial}
+            </div>
+            <span class="text-xs text-white/40 font-sans">{v.attr}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

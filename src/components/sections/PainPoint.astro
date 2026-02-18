@@ -1,0 +1,47 @@
+---
+import SectionHeader from '../ui/SectionHeader.astro'
+
+const items = [
+  '決断に時間がかかり、いつも後悔する',
+  '同じ失敗パターンを繰り返している気がする',
+  '人に合わせすぎて、気づいたら消耗している',
+  '感覚で選んで、「違ったかも」と感じやすい',
+  '考えすぎて、結局どこにも進めない',
+]
+
+const lineUrl = 'https://bysfl175.autosns.app/line'
+---
+
+<section class="section-dark py-20 sm:py-28 px-4">
+  <div class="max-w-2xl mx-auto">
+    <SectionHeader label="Pain Point" title="こんなこと、ありませんか？" />
+
+    <div class="space-y-5 mb-12">
+      {items.map((item, i) => (
+        <p class:list={[
+          'check-item text-sm sm:text-base text-white/75 leading-relaxed font-sans reveal',
+          i < 2 ? 'reveal-delay-1' : i < 4 ? 'reveal-delay-2' : 'reveal-delay-3'
+        ]}>
+          {item}
+        </p>
+      ))}
+    </div>
+
+    <div class="reveal reveal-delay-3 text-center border-t border-brand-gold/10 pt-10">
+      <p class="text-sm sm:text-base text-white/60 leading-loose font-sans">
+        それは、意志の弱さや経験不足ではありません。<br />
+        あなたが<span class="text-brand-gold font-medium">「無意識に使っている選び方の傾向」</span>が、<br />
+        判断に影響しているだけです。
+      </p>
+      <p class="text-sm text-white/45 font-sans mt-6">
+        その傾向は、<span class="text-brand-gold/70">生年月日からAIが1分で整理</span>できます。
+      </p>
+      <a
+        href={lineUrl}
+        class="inline-block mt-6 text-sm font-semibold text-brand-line hover:text-brand-line-hover transition-colors font-sans"
+      >
+        まずは自分の傾向を見てみる &rarr;
+      </a>
+    </div>
+  </div>
+</section>
