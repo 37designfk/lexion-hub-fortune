@@ -1,0 +1,150 @@
+{
+  "name": "Lexion Hub Fortune — 判断傾向レポート",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lexion-fortune",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 300],
+      "id": "webhook-lexion",
+      "name": "Webhook",
+      "webhookId": "lexion-fortune"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AutoSNS形式 or 直接JSON形式の両方に対応\nconst body = $input.first().json.body || $input.first().json;\n\n// AutoSNS形式: form_data[form-N] / 直接: date, time\nlet dateRaw = body.date || body['form_data[form-date]'] || null;\nlet timeRaw = body.time || body['form_data[form-time]'] || null;\nconst uid = body.uid || null;\nconst nickname = body['user_data[nickname]'] || body.name || 'ユーザー';\n\n// 日付整形\nconst formatDate = (v) => {\n  if (!v) return null;\n  if (/^\\d{8}$/.test(v)) {\n    return `${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`;\n  }\n  const nums = v.match(/\\d+/g);\n  if (!nums || nums.length < 3) return null;\n  return `${nums[0]}-${nums[1].padStart(2,'0')}-${nums[2].padStart(2,'0')}`;\n};\n\n// 時間整形\nconst formatTime = (v) => {\n  if (!v || v === 'わからない' || v === '不明') return null;\n  const nums = v.match(/\\d+/g);\n  if (!nums || nums.length < 2) return null;\n  return `${nums[0].padStart(2,'0')}:${nums[1].padStart(2,'0')}`;\n};\n\nconst date = formatDate(dateRaw);\nconst time = formatTime(timeRaw);\n\nif (!date) {\n  return [{ json: { error: true, message: '生年月日が取得できませんでした' } }];\n}\n\nreturn [{\n  json: {\n    date,\n    time,\n    uid,\n    nickname\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "id": "parse-input",
+      "name": "入力整形"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://bazi.37d.jp/bazi/calculate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "date", "value": "={{ $json.date }}" },
+            { "name": "time", "value": "={{ $json.time }}" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [440, 300],
+      "id": "bazi-api",
+      "name": "命式生成 (BaZi API)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// BaZi APIレスポンスを整形してAIに渡すコンテキストを作成\nconst bazi = $input.first().json;\nconst nickname = $('入力整形').first().json.nickname;\n\n// AIに渡す命式サマリー\nconst context = JSON.stringify({\n  pillars: bazi.pillars,\n  fiveElements: bazi.fiveElements,\n  stars: {\n    dayMaster: bazi.stars.dayMaster,\n    tenGodSummary: bazi.stars.tenGodSummary\n  }\n}, null, 2);\n\nreturn [{\n  json: {\n    nickname,\n    baziContext: context,\n    baziRaw: bazi\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300],
+      "id": "format-bazi",
+      "name": "命式整形"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=あなたは四柱推命の命式データを読み解き、ユーザーの「判断パターン・行動傾向」をわかりやすく整理するレポートライターです。心理カウンセラーのように温かく、しかしデータに基づいた客観的な視点で書いてください。\n\n## 絶対ルール\n- 「占い」「運命」「当たる」「宿命」「運勢」という言葉は絶対に使わない\n- 未来の出来事を予測・断定しない\n- 不安を煽る表現は使わない\n- あくまで「傾向」「パターン」「整理」のトーンで一貫する\n- 命式の専門用語は一切使わず、一般的な言葉に変換して伝える\n- 断定ではなく「〜の傾向があります」「〜しやすい面があります」という表現を使う\n- ユーザーの行動を肯定し、「変わるべき」というニュアンスは避ける\n- 敬語（です・ます調）で統一する\n- コードブロック記法は使わない\n\n## 日主の性格基盤\n甲(木陽):まっすぐで一貫性。大きな目標に向かって着実。リーダー気質\n乙(木陰):柔軟で協調的。環境に適応しながらしなやかに成長\n丙(火陽):明るく情熱的。周囲を照らす存在感。オープンで裏表がない\n丁(火陰):繊細で洞察力がある。静かに燃える情熱。内面の豊かさ\n戊(土陽):安定感があり信頼される。動じない大きな器。包容力\n己(土陰):面倒見が良く献身的。人を受け止める。縁の下の力持ち\n庚(金陽):決断力があり切れ味が鋭い。正義感が強い。改革を恐れない\n辛(金陰):繊細で美意識が高い。鋭い感性。完成度にこだわる職人気質\n壬(水陽):知恵があり視野が広い。大きな流れを読む力。自由を愛する\n癸(水陰):直感が鋭く感受性が豊か。静かに深く考える。想像力が強み\n\n## 十神の読み解き\n比肩:自分の意志を貫く・独立心・マイペース\n劫財:競争心・負けず嫌い・行動力・主導権\n食神:楽観的・表現力・楽しむことを重視\n傷官:感受性が強い・完璧主義・鋭い批評眼\n偏財:社交的・臨機応変・チャンスに敏感\n正財:堅実・計画的・コツコツ型・安定志向\n偏官:責任感・リーダーシップ・プレッシャーに強い\n正官:秩序を重んじる・信頼を大切にする\n偏印:知的好奇心・独自の視点・直感型\n正印:学ぶことを好む・人に教える力・包容力\n\n## 五行バランス\n最も多い五行→行動に最も表れやすい性質\nゼロまたは極端に少ない五行→意識しにくい「盲点」\n木:成長・計画・前進　火:情熱・表現・直感　土:安定・信頼・持続　金:決断・効率・完成　水:柔軟・知恵・適応\n\n## 出力フォーマット（800〜1200文字、LINEで読みやすく）\n\n━━━━━━━━━━━━━━━\nあなたの判断傾向レポート\n━━━━━━━━━━━━━━━\n\n■ サマリー\n→3〜4文で要約。括弧つき見出し補足は出力しない\n■ 力を発揮しやすい場面\n→3項目。各項目2〜3文。箇条書き（・）で書く\n■ 消耗しやすいパターン\n→3項目。各項目2〜3文。箇条書き（・）で書く\n■ 判断の癖と傾向\n→2〜3パターン。箇条書き（・）で書く\n■ まとめ\n→2〜3文。肯定的に締める\n\n※セクション見出しは「■ サマリー」「■ 力を発揮しやすい場面」のように括弧なしで出力すること\n\n━━━━━━━━━━━━━━━\nLexion Hub Fortune\n━━━━━━━━━━━━━━━\n\n## 品質基準\n- 各セクションで具体的な場面を必ず1つ以上入れる\n- 抽象的な形容詞ではなく「行動」として描写する\n- 五行の偏りとゼロの要素は必ず反映する\n- 十神で最も多い星とゼロの星の対比からパターンを読み取る\n- 読み終わった後に「自分のことだ」と感じられる具体性を持たせる\n\n---\n以下の命式データからレポートを生成してください。\n\n{{ $json.baziContext }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "id": "ai-report",
+      "name": "レポート生成 (AI)",
+      "credentials": {
+        "openAiApi": {
+          "id": "RMHB7N4C0iqC7mgL",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// AIレスポンスからレポートテキストを抽出\nconst raw = $input.first().json;\nlet reportText = '';\n\n// n8n OpenAI node output format\nif (raw.output && Array.isArray(raw.output)) {\n  raw.output.forEach(msg => {\n    if (msg.content && Array.isArray(msg.content)) {\n      msg.content.forEach(block => {\n        if (block.text) reportText += block.text;\n      });\n    }\n  });\n} else if (typeof raw.text === 'string') {\n  reportText = raw.text;\n} else if (typeof raw.content === 'string') {\n  reportText = raw.content;\n}\n\nconst nickname = $('入力整形').first().json.nickname;\nconst uid = $('入力整形').first().json.uid;\n\nreturn [{\n  json: {\n    report: reportText.trim(),\n    nickname,\n    uid\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "id": "format-report",
+      "name": "レポート整形"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, nickname: $json.nickname, report: $json.report }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 300],
+      "id": "respond",
+      "name": "レスポンス返却"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "入力整形", "type": "main", "index": 0 }]
+      ]
+    },
+    "入力整形": {
+      "main": [
+        [{ "node": "命式生成 (BaZi API)", "type": "main", "index": 0 }]
+      ]
+    },
+    "命式生成 (BaZi API)": {
+      "main": [
+        [{ "node": "命式整形", "type": "main", "index": 0 }]
+      ]
+    },
+    "命式整形": {
+      "main": [
+        [{ "node": "レポート生成 (AI)", "type": "main", "index": 0 }]
+      ]
+    },
+    "レポート生成 (AI)": {
+      "main": [
+        [{ "node": "レポート整形", "type": "main", "index": 0 }]
+      ]
+    },
+    "レポート整形": {
+      "main": [
+        [{ "node": "レスポンス返却", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "pinData": {}
+}
