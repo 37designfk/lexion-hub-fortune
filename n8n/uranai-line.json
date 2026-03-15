@@ -1,0 +1,250 @@
+{
+  "id": "uranai-line-bot",
+  "versionId": "4",
+  "name": "占いAI LINE Bot — さくら",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "uranai-line",
+        "responseMode": "onReceived",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 300],
+      "id": "wh-uranai-line",
+      "name": "LINE Webhook",
+      "webhookId": "uranai-line"
+    },
+    {
+      "parameters": {
+        "jsCode": "// LINE イベント解析\nconst body = $input.first().json;\n\n// イベント取得\nconst events = body.body?.events || body.events || [];\nif (!events.length) {\n  return [{ json: { skip: true, reason: 'No events' } }];\n}\n\nconst event = events[0];\n\n// テキストメッセージ以外はスキップ\nif (event.type !== 'message' || event.message?.type !== 'text') {\n  return [{ json: { skip: true, reason: 'Not text message' } }];\n}\n\nreturn [{\n  json: {\n    skip: false,\n    replyToken: event.replyToken,\n    lineUserId: event.source?.userId || 'unknown',\n    userMessage: event.message.text\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "id": "parse-line-event",
+      "name": "LINE Event 解析"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [440, 300],
+      "id": "if-text-msg",
+      "name": "テキストメッセージ?"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO conversations (line_user_id, role, message) VALUES ('{{ $('LINE Event 解析').first().json.lineUserId }}', 'user', '{{ $('LINE Event 解析').first().json.userMessage.replace(/'/g, \"''\") }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [660, 300],
+      "id": "db-save-user",
+      "name": "ユーザーメッセージ保存",
+      "credentials": {
+        "postgres": {
+          "id": "6X7nUVkeeTIw6m9W",
+          "name": "uranai_ai DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT role, message FROM conversations WHERE line_user_id = '{{ $('LINE Event 解析').first().json.lineUserId }}' ORDER BY created_at DESC LIMIT 10",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [880, 300],
+      "id": "db-get-history",
+      "name": "会話履歴取得",
+      "credentials": {
+        "postgres": {
+          "id": "6X7nUVkeeTIw6m9W",
+          "name": "uranai_ai DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 過去の会話履歴をAnthropic messages形式に変換\nconst history = $('会話履歴取得').all().map(item => item.json);\nconst userMessage = $('LINE Event 解析').first().json.userMessage;\n\n// 履歴は DESC で取得しているので reverse\nconst reversed = history.reverse();\n\n// messages 配列を構築（最後の1件=今のメッセージは除外）\nconst messages = [];\nfor (let i = 0; i < reversed.length - 1; i++) {\n  messages.push({\n    role: reversed[i].role,\n    content: reversed[i].message\n  });\n}\n// 今のメッセージを追加\nmessages.push({ role: 'user', content: userMessage });\n\nreturn [{ json: { messages } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "id": "build-messages",
+      "name": "メッセージ構築"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "anthropicApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-3-haiku-20240307\",\n  \"max_tokens\": 1024,\n  \"system\": \"あなたは『さくら』という名前の占いAIアシスタントです。\\n\\n## キャラクター\\n- 名前: さくら\\n- 性格: 温かく親しみやすい。落ち着いた大人の女性。時々ユーモアを交える\\n- 口調: 丁寧だけどフレンドリー（です・ます調ベース、時々くだけた表現OK）\\n- 得意: 四柱推命をベースにした性格分析・判断傾向の読み解き\\n\\n## ルール\\n- LINEメッセージなので、1回の返信は300文字以内に収める\\n- 長い説明が必要な場合は複数回に分けて会話する\\n- 「占い」「運命」「当たる」「宿命」「運勢」という言葉は使わない\\n- 未来の出来事を予測・断定しない\\n- 不安を煽らない\\n- 「傾向」「パターン」「タイプ」のトーンで一貫する\\n- 命式の専門用語は使わない\\n- 初回は挨拶して、生年月日・時間を聞く\\n- 生年月日がわかったら性格傾向を簡潔に伝える\\n- ユーザーの悩みに寄り添いながら、傾向分析をベースにアドバイスする\\n- 絵文字は控えめに（1メッセージに1〜2個まで）\\n\\n## 会話の流れ\\n1. 挨拶 → 生年月日を聞く\\n2. 生年月日をもらったら → 簡単な性格傾向を伝える\\n3. 以降 → ユーザーの質問や悩みに対して傾向分析ベースで会話\",\n  \"messages\": {{ JSON.stringify($json.messages) }}\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [1320, 300],
+      "id": "claude-api",
+      "name": "Claude API",
+      "credentials": {
+        "anthropicApi": {
+          "id": "NfUymO522LCAOjgO",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Claude APIレスポンスからテキスト抽出\nconst response = $input.first().json;\nlet assistantMessage = '';\n\nif (response.content && Array.isArray(response.content)) {\n  assistantMessage = response.content\n    .filter(block => block.type === 'text')\n    .map(block => block.text)\n    .join('');\n} else if (typeof response.text === 'string') {\n  assistantMessage = response.text;\n}\n\n// LINEメッセージは5000文字制限\nif (assistantMessage.length > 5000) {\n  assistantMessage = assistantMessage.substring(0, 4997) + '...';\n}\n\nreturn [{\n  json: {\n    assistantMessage: assistantMessage.trim(),\n    replyToken: $('LINE Event 解析').first().json.replyToken,\n    lineUserId: $('LINE Event 解析').first().json.lineUserId\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 300],
+      "id": "extract-response",
+      "name": "応答抽出"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO conversations (line_user_id, role, message) VALUES ('{{ $json.lineUserId }}', 'assistant', '{{ $json.assistantMessage.replace(/'/g, \"''\") }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [1760, 300],
+      "id": "db-save-assistant",
+      "name": "応答保存",
+      "credentials": {
+        "postgres": {
+          "id": "6X7nUVkeeTIw6m9W",
+          "name": "uranai_ai DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer ifVf+ZYeltmVUthX8Xv+o7ZhAI2iue03Nb/yoVbmOlMCv4UrWweuNQGCpeRI4DAwEmXtHvolZG6PuvIN8575vx8cwgE67wGBBLrpNeqmBTDml9cBH20N+ITTg7zvx3+N7RWL5p/rDQi6S7++1H9sgAdB04t89/1O/w1cDnyilFU=" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('応答抽出').first().json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": {{ JSON.stringify($('応答抽出').first().json.assistantMessage) }}\n    }\n  ]\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [1980, 300],
+      "id": "line-reply",
+      "name": "LINE Reply"
+    }
+  ],
+  "connections": {
+    "LINE Webhook": {
+      "main": [
+        [{ "node": "LINE Event 解析", "type": "main", "index": 0 }]
+      ]
+    },
+    "LINE Event 解析": {
+      "main": [
+        [{ "node": "テキストメッセージ?", "type": "main", "index": 0 }]
+      ]
+    },
+    "テキストメッセージ?": {
+      "main": [
+        [
+          { "node": "ユーザーメッセージ保存", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    },
+    "ユーザーメッセージ保存": {
+      "main": [
+        [{ "node": "会話履歴取得", "type": "main", "index": 0 }]
+      ]
+    },
+    "会話履歴取得": {
+      "main": [
+        [{ "node": "メッセージ構築", "type": "main", "index": 0 }]
+      ]
+    },
+    "メッセージ構築": {
+      "main": [
+        [{ "node": "Claude API", "type": "main", "index": 0 }]
+      ]
+    },
+    "Claude API": {
+      "main": [
+        [{ "node": "応答抽出", "type": "main", "index": 0 }]
+      ]
+    },
+    "応答抽出": {
+      "main": [
+        [{ "node": "応答保存", "type": "main", "index": 0 }]
+      ]
+    },
+    "応答保存": {
+      "main": [
+        [{ "node": "LINE Reply", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "pinData": {}
+}
